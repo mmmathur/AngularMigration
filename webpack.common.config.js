@@ -8,7 +8,7 @@ var Visualizer = require('webpack-visualizer-plugin');
 var webpack = require('webpack');
 var config = {
   entry: {
-    'ui-client-app-shell': './app-shell/index.ts'
+    'ui-client-app-shell': './app-shell/main.ts'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
