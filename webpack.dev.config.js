@@ -10,13 +10,15 @@ var uiContext = require('./server/ui-context');
 var padEnd = require('lodash.padend');
 
 var config = {
+  mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
     historyApiFallback: true,
     inline: true,
     quiet: true,
     proxy: {
-      '/api/internal/*': 'http://localhost:3000/'
+      '/api/internal/*': 'http://localhost:3000/',
+      '/ui/session-manager/*': 'http://localhost:3000/'
     }
   },
   output: {
@@ -35,7 +37,7 @@ var config = {
       turnBackURLPrefix: padEnd('', uiContext.baseHref ? (uiContext.baseHref.split("/").length - 2) * 3 : 0, '../'),
       title: 'Customer Servicing UI client',
       hash: true,
-      chunks: ['ngMigration'],
+      chunks: ['ui-client-app-shell'],
       window: {
         uiContext
       }

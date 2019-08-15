@@ -1,18 +1,18 @@
 /* eslint-disable vars-on-top, no-var */
-
 var webpack = require('webpack');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var path = require('path');
 var AssetsPlugin = require('assets-webpack-plugin');
 
 var config = {
+  mode: 'production',
   output: {
     filename: '[name].[hash].bundle.js'
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].bundle.css'}
-      ),
+      filename: '[name].[contenthash].bundle.css'
+    }),
     new webpack.DefinePlugin({
       DEV_MODE: false
     }),

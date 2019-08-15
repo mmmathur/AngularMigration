@@ -5,86 +5,105 @@ var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 var autoprefixer = require('autoprefixer');
 var path = require('path');
 var Visualizer = require('webpack-visualizer-plugin');
-
+var webpack = require('webpack');
 var config = {
   entry: {
-    'ngMigration': './app-shell/index.ts'
+    'ui-client-app-shell': './app-shell/index.ts'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].bundle.js',
     chunkFilename: '[id].bundle.js'
   },
+  optimization: 
+  {
+    splitChunks: {
+      chunks: 'all'
+    }
+  },
   resolve: {
-    root: [
+    modules: [
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'client')],
-    extensions: ['.ts', '.js', '']
+    extensions: ['.ts', '.js']
   },
   plugins: [
+    new webpack.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)fesm5/, path.join(__dirname, './client')),
     new LodashModuleReplacementPlugin(),
-    new Visualizer()
+    new Visualizer(),
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        context: __dirname,
+        postcss: [
+          autoprefixer
+        ]
+      }
+    })
   ],
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.ts$/,
-        loader: 'ts-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.js$/,
-        loader: 'ng-annotate-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-        query: {
-          cacheDirectory: true,
-          compact: false
+        loaders: [
+            'babel-loader',
+            {
+                loader: 'ts-loader'
+            },
+            'angular2-template-loader',
+            'angular-router-loader'
+        ],
+        exclude: [/node_modules/]
+    },
+    {
+      // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
+      // Removing this will cause deprecation warnings to appear.
+      test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
+      parser: { system: true },
+    },
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'ng-annotate-loader'
+      }
+    },
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader'
+      }
+    },
+    {
+      test: /\.css/,
+      use: [MiniCssExtractPlugin.loader, "css-loader"]
+    },
+    {
+      test: /\.(png|jpg|gif|woff|woff2|ttf|eot|svg)/,
+      use: {
+        loader: 'url-loader'
         }
       },
       {
-        test: /\.css$/,
-        use: [
-          {
-            loader: 'style-loader'
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true
-            }
-          },
-        ],
-      },
-      {
-        test: /\.(png|jpg|gif|woff|woff2|ttf|eot|svg)/,
-        loader: 'url-loader'
-      },
-      {
         test: /\.html$/,
-        loader: 'html-loader?minimize=false'
-      },
-      {
-        test: /\.json/,
-        loader: 'json-loader'
+        use: {
+          loader: 'html-loader?minimize=false'
+        },
       },
       {
         test: /node_modules(\/|\\)globalize/,
-        loader: 'imports?define=>false'
+        use: {
+          loader: 'imports?define=>false'
+        }
+        
       },
       {
         test: /node_modules(\/|\\)cldrjs/,
-        loader: 'imports?define=>false'
+        use: {
+          loader: 'imports?define=>false'
+        }
       }
     ]
-  },
-  postcss: [autoprefixer],
-  resolveLoader: {
-    root: path.resolve(__dirname, 'node_modules')
   }
 };
 
